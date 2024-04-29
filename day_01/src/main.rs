@@ -1,6 +1,6 @@
 use std::fs;
 
-use day_01::{sum_all_calibration_values, part_02};
+use day_01::{part_01, part_02};
 
 fn main() {
     part01();
@@ -9,7 +9,7 @@ fn main() {
 
 fn part01() {
     let data = fs::read_to_string("input.txt").expect("imput.txt was not found");
-    let res = sum_all_calibration_values(data.as_str());
+    let res = part_01(data.as_str());
     println!("Part One  is {res}");
 }
 

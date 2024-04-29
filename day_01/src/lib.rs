@@ -1,8 +1,6 @@
-
 use std::collections::HashMap;
 use lazy_static::lazy_static;
 
-//const NUMBERS0_9: [&'static str; 10] = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
 
 lazy_static! {
     static ref NUMBERS: HashMap<&'static str, &'static str> = {
@@ -22,7 +20,7 @@ lazy_static! {
     };
 }
 
-pub fn sum_all_calibration_values(s: &str) -> u32 {
+pub fn part_01(s: &str) -> u32 {
     s.split("\n")
         .map(|row| {
             let first = find_first_number(row);
@@ -34,86 +32,30 @@ pub fn sum_all_calibration_values(s: &str) -> u32 {
 }
 
 
-
-pub fn part_02_01(s: &str) -> u32 {
-    let res =  s.split("\n").map(|s| {
-    let mut all_done = false;
-    let mut ss = s;
-    let mut line = "".to_string();
-        while !all_done {
-            let next_number = first_number_in_letters(ss);
-            if next_number.0 == usize::MAX {
-                //line.push_str(s);
-                all_done = true;
-                line.push_str(ss);
-            } else {
-                let number = NUMBERS.get(next_number.1).unwrap();
-                line.push_str(&ss[..next_number.0]);
-                line.push_str(*number);
-                ss = &ss[next_number.0+next_number.1.len()..];
-            }
-        }
-        line
-    }).collect::<Vec<_>>().join("\n");
-    println!("---------");
-    println!("{}", res);
-    println!("---------");
-    sum_all_calibration_values(res.as_str())  
-}
-
-
 pub fn part_02(s: &str) -> u32{
     let res =  s.split("\n").map(|s| {
         let first = first_number_in_letters(s);
         let last = last_number_in_letters(s);
-        // if first.0 == usize::MAX {
-        //     s.to_string()
-        // } else if first.0+first.1.len()-1 < last.0 {
-        //     found_two_numbers(first, last, s)
-        // } else {
-        //     found_one_number(first, s)
-        // }
         if first.0 == usize::MAX {
             s.to_string()
         } else {
             found_two_numbers(first, last, s)
         }
     }).collect::<Vec<_>>().join("\n");
-    println!("---------");
-    println!("{}", res);
-    println!("---------");
-    sum_all_calibration_values(res.as_str())   
-}
-
-fn found_one_number(first: (usize, &str), s: &str) -> String {
-    let mut aux_res = "".to_string();
-    let a = first.0+first.1.len();
-    let ab = &s[a..];
-    let first_number = NUMBERS.get(first.1).unwrap();
-    aux_res.push_str(&s[..first.0]);
-    aux_res.push_str(*first_number);
-    aux_res.push_str(ab);
-    aux_res
+    part_01(res.as_str())   
 }
 
 fn found_two_numbers(first: (usize, &str), last: (usize, &str), s: &str) -> String {
     let mut aux_res = "".to_string();
-    let a = first.0+(first.1.len());
-    let b = last.0;
-    //let ab = &s[a..b];
-
     let first_number = NUMBERS.get(first.1).unwrap();
     let last_number = NUMBERS.get(last.1).unwrap();
     aux_res.push_str(&s[..first.0]);
     aux_res.push_str(*first_number);
-    //aux_res.push_str(ab);
     aux_res.push_str(*last_number);
-    let bb = b+(last.1.len());
-    aux_res.push_str(&s[bb..]);
+    let tail_pos = last.0+(last.1.len());
+    aux_res.push_str(&s[tail_pos..]);
     aux_res
 }
-
-
 
 pub fn first_number_in_letters(s: &str) -> (usize, &str) {
     let mut min_pos = usize::MAX;
@@ -153,24 +95,31 @@ fn find_second_number(s: &str) -> &str {
 }
 
 
-/* 
-fn find_numbers_in_letters(s: &str) -> Vec<(usize, &str)> {
-    let mut res = NUMBERS.clone().into_keys()
-        .map(|num| {
-            match s.rfind(num) {
-                Some(pos) => (pos, num),
-                _ => (usize::MAX, "")
+
+// WRONG SOLUTION!!!!
+// fiveight -> 55 instead of 58
+pub fn part_02_00(s: &str) -> u32 {
+    let res =  s.split("\n").map(|s| {
+    let mut all_done = false;
+    let mut ss = s;
+    let mut line = "".to_string();
+        while !all_done {
+            let next_number = first_number_in_letters(ss);
+            if next_number.0 == usize::MAX {
+                all_done = true;
+                line.push_str(ss);
+            } else {
+                let number = NUMBERS.get(next_number.1).unwrap();
+                line.push_str(&ss[..next_number.0]);
+                line.push_str(*number);
+                ss = &ss[next_number.0+next_number.1.len()..];
             }
-        })
-        .filter(|(a, _b)| *a < usize::MAX)
-        .collect::<Vec<(usize, &str)>>();
-    res.sort();
-    res
+        }
+        line
+    }).collect::<Vec<_>>().join("\n");
+    part_01(res.as_str())  
 }
-
-*/
-
-
+// WRONG SOLUTION!!!!
 
 #[cfg(test)]
 mod tests {
@@ -191,20 +140,20 @@ zoneight234
 
     #[test]
     fn test_sum_all_calibration_values() {
-        let res = sum_all_calibration_values(INPUT);   
+        let res = part_01(INPUT);   
         assert_eq!(142, res);    
     } 
 
     
     #[test]
     fn test_sum_all_calibration_values_001_000() {
-        let res = sum_all_calibration_values("drsgdrrgscqmsggrgq1fsqjhtkkrltt");   
+        let res = part_01("drsgdrrgscqmsggrgq1fsqjhtkkrltt");   
         assert_eq!(11, res);    
     } 
 
     #[test]
     fn test_sum_all_calibration_values_001() {
-        let res = sum_all_calibration_values("219");   
+        let res = part_01("219");   
         assert_eq!(29, res);    
     } 
 
@@ -280,7 +229,7 @@ zoneight234
 
     #[test]
     fn test_part_two_014_00() {
-        let res = part_02_01("fiveight"); 
+        let res = part_02_00("fiveight"); 
         assert_eq!(55, res);   
     } 
 
