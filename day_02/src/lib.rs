@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-//#[derive(Copy, Clone)]
+#[derive(Debug)]
 struct Game {
     id: u32,
     turns: Vec<HashMap<String, u32>>
@@ -16,9 +16,11 @@ pub fn part_01(s: &str) -> u32 {
         .map(|line| process_line(line))
         .collect::<Vec<Game>>();
     let res:u32 = games.into_iter()
-        .map(|game| game2rgb(&game))
-        .filter(|rgb| rgb.1 <= MAX_RED && rgb.2 <= MAX_GREEN && rgb.3 <= MAX_BLUE)
-        .map(|x| {println!("***{:?}", x);x.0})
+        .filter(|game| is_valid_game(&game))
+        .map(|x| {
+            println!("***{:?}", x);
+            x.id
+        })
         .sum();
     res
 }
@@ -56,9 +58,9 @@ fn get_turn(s: &str) -> HashMap<String, u32> {
 }
 
 
-fn game2rgb(game: &Game) -> (u32, u32, u32, u32) {
+fn is_valid_game(game: &Game) -> bool {
     let f = &game.turns;
-    let res =f.into_iter()
+    let res = f.into_iter()
         .map(|turn| {
             // println!("ssss");
             // let red = *turn.get("red").unwrap_or(&0);
@@ -67,13 +69,9 @@ fn game2rgb(game: &Game) -> (u32, u32, u32, u32) {
             let blue = *turn.get("blue").unwrap_or(&0);
             (red, green, blue)
         })
-        .reduce(|acc, e| (acc.0 + e.0, acc.1 + e.1, acc.2 + e.2)).unwrap();
-    let data = (game.id, res.0, res.1, res.2);
-    println!("{:?}", data);
-    data
-    
+        .filter(|rgb| rgb.0 <= MAX_RED && rgb.1 <= MAX_GREEN && rgb.2 <= MAX_BLUE).collect::<Vec<(u32, u32, u32)>>();
+    res.len() == f.len()
 } 
-
 
 
 #[cfg(test)]
@@ -95,7 +93,7 @@ Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green";
     fn process_line_001() {
         let game = process_line("Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green");
         assert_eq!(game.id, 1);
-        assert_eq!(game2rgb(&game), (1, 5, 4, 9));
+        assert!(is_valid_game(&game));
     }
 
     #[test]
