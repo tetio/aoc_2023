@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{cmp, collections::HashMap};
 
 #[derive(Debug)]
 struct Game {
@@ -12,24 +12,24 @@ const MAX_BLUE: u32 = 14;
 
 
 pub fn part_01(s: &str) -> u32 {
-    let games = s.split("\n")
-        .map(|line| process_line(line))
-        .collect::<Vec<Game>>();
-    let res:u32 = games.into_iter()
+    let res = s.split("\n")
+        .map(|line| line2game(line))
         .filter(|game| is_valid_game(&game))
-        .map(|x| {
-            println!("***{:?}", x);
-            x.id
-        })
+        .map(|game| game.id)
         .sum();
     res
 }
 
-pub fn part_02(_s: &str) -> u32 {
-    0
+pub fn part_02(s: &str) -> u32 {
+    let res = s.split("\n")
+        .map(|line| line2game(line))
+        .map(|game| calculate_power(&game))
+        .sum();
+    res
 }
 
-fn process_line(line: &str) -> Game {
+
+fn line2game(line: &str) -> Game {
     let mut parts = line.split(':');
     let id = parts.next().expect("Game id part is missing").split(' ').last().unwrap().parse().unwrap();
     let game_turn_part = parts.next().expect("Game turn part is missing");
@@ -59,20 +59,25 @@ fn get_turn(s: &str) -> HashMap<String, u32> {
 
 
 fn is_valid_game(game: &Game) -> bool {
-    let f = &game.turns;
-    let res = f.into_iter()
-        .map(|turn| {
-            // println!("ssss");
-            // let red = *turn.get("red").unwrap_or(&0);
-            let red = *turn.get("red").unwrap_or(&0);
-            let green = *turn.get("green").unwrap_or(&0);
-            let blue = *turn.get("blue").unwrap_or(&0);
-            (red, green, blue)
-        })
-        .filter(|rgb| rgb.0 <= MAX_RED && rgb.1 <= MAX_GREEN && rgb.2 <= MAX_BLUE).collect::<Vec<(u32, u32, u32)>>();
-    res.len() == f.len()
+    let valid_turns = turns2rgb( &game.turns).into_iter()
+    .filter(|rgb| rgb.0 <= MAX_RED && rgb.1 <= MAX_GREEN && rgb.2 <= MAX_BLUE).collect::<Vec<(u32, u32, u32)>>();
+    valid_turns.len() ==  game.turns.len()
 } 
 
+fn calculate_power(game: &Game) -> u32 {
+    let rgb = turns2rgb(&game.turns).into_iter()
+    .reduce(|acc, e| (cmp::max(acc.0, e.0), cmp::max(acc.1, e.1), cmp::max(acc.2, e.2))).unwrap();
+    rgb.0 * rgb.1 * rgb.2
+}
+
+fn turns2rgb(turns: &Vec<HashMap<String, u32>>) -> Vec<(u32, u32, u32)> {
+    turns.into_iter().map(|turn| {
+        let red = *turn.get("red").unwrap_or(&0);
+        let green = *turn.get("green").unwrap_or(&0);
+        let blue = *turn.get("blue").unwrap_or(&0);
+        (red, green, blue)
+    }).collect::<Vec<(u32, u32, u32)>>()
+}
 
 #[cfg(test)]
 mod tests {
@@ -90,8 +95,14 @@ Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green";
     }
 
     #[test]
+    fn process_part_02() {
+        let res = part_02(INPUT);
+        assert_eq!(res, 2286);
+    }
+
+    #[test]
     fn process_line_001() {
-        let game = process_line("Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green");
+        let game = line2game("Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green");
         assert_eq!(game.id, 1);
         assert!(is_valid_game(&game));
     }
