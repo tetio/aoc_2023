@@ -12,27 +12,29 @@ const MAX_BLUE: u32 = 14;
 
 
 pub fn part_01(s: &str) -> u32 {
-    let games = s.split("\n").map(|line| process_line(line)).collect::<Vec<Game>>();
+    let games = s.split("\n")
+        .map(|line| process_line(line))
+        .collect::<Vec<Game>>();
     let res:u32 = games.into_iter()
-    .map(|game| game2rgb(&game))
-    .filter(|rgb| rgb.1 <= MAX_RED && rgb.2 <= MAX_GREEN && rgb.3 <= MAX_BLUE)
-    .map(|x| {println!("***{:?}", x);x.0})
-    .sum();
+        .map(|game| game2rgb(&game))
+        .filter(|rgb| rgb.1 <= MAX_RED && rgb.2 <= MAX_GREEN && rgb.3 <= MAX_BLUE)
+        .map(|x| {println!("***{:?}", x);x.0})
+        .sum();
     res
 }
 
-pub fn part_02(s: &str) -> u32 {
+pub fn part_02(_s: &str) -> u32 {
     0
 }
 
 fn process_line(line: &str) -> Game {
     let mut parts = line.split(':');
-    let game_id_part = parts.next().expect("Game id part is missing").split(' ').last().unwrap().parse().unwrap();
+    let id = parts.next().expect("Game id part is missing").split(' ').last().unwrap().parse().unwrap();
     let game_turn_part = parts.next().expect("Game turn part is missing");
     let turns = get_turns(game_turn_part);
     Game {
-        id: game_id_part,
-        turns: turns
+        id,
+        turns
     }
 }
 
