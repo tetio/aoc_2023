@@ -42,20 +42,20 @@ pub fn part_02(input: &str) -> u32 {
         hm.insert(card, (correct_numbers, 1));
     });
     let max_card = hm.len() as u32;
-    let mut res: HashMap<u32, (u32, u32)> = hm.clone();
+    //let mut res: HashMap<u32, (u32, u32)> = hm.clone();
     for k in 1 .. max_card {
         let max_key = k + hm[&k].0;
         // println!("Clau {}, {} vegades", k, res[&k].1);
-        for _ in 0 .. res[&k].1 {
+        for _ in 0 .. hm[&k].1 {
             for new_key in k+1..=max_key {
                 if new_key <= max_card {
-                    let n = res[&new_key];
+                    let n = hm[&new_key];
                     // println!("Actualitzo clau {} amb el nou valor {}", new_key, n.1+1);
-                    res.insert(new_key, (n.0, n.1+1));            }
+                    hm.insert(new_key, (n.0, n.1+1));            }
             }
         }
     };
-    res.values().map(|x| x.1).sum()
+    hm.values().map(|x| x.1).sum()
 }
 
 #[cfg(test)]
