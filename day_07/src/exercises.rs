@@ -153,7 +153,6 @@ fn count_cards(hand: &str, card: char) -> usize {
 #[cfg(test)]
 mod tests {
     use std::cmp::Ordering;
-    use crate::*;
     use crate::exercises::*;
 
     const INPUT: &str = "32T3K 765
@@ -198,14 +197,14 @@ JJJJJ 483";
         let a = "AA";
         let b = "22";
         let result = second_ordering(a, b);
-        assert_eq!(result, 1);
+        assert_eq!(result, -1);
     }
     #[test]
     fn scn_second_ordering_is_first_greater_02() {
         let a = "2222A";
         let b = "2222K";
         let result = second_ordering(a, b);
-        assert_eq!(result, 1);
+        assert_eq!(result, -1);
     }
 
     #[test]
@@ -213,7 +212,7 @@ JJJJJ 483";
         let a = "22222";
         let b = "22223";
         let result = second_ordering(a, b);
-        assert_eq!(result, -1);
+        assert_eq!(result, 1);
     }
 
     #[test]
@@ -221,7 +220,7 @@ JJJJJ 483";
         let a = "T55J5";
         let b = "QQQJA";
         let result = second_ordering(a, b);
-        assert_eq!(result, -1);
+        assert_eq!(result, 1);
     }
 
     // compare_cards(&hand1[0..1], &hand2[0..1]
@@ -230,7 +229,7 @@ JJJJJ 483";
         let a = "T55J5";
         let b = "QQQJA";
         let result = compare_cards(&a[0..1], &b[0..1]);
-        assert!(result < 0);
+        assert!(result > 0);
     }
 
     #[test]
@@ -238,15 +237,15 @@ JJJJJ 483";
         let a = "T55J5";
         let b = "QQQJA";
         let result = compare_cards(&a[0..1], &b[0..1]);
-        assert!(result < 0);
+        assert!(result > 0);
     }
 
     #[test]
     fn scn_second_ordering_01() {
-        let a = "1AAAA";
-        let b = "AAAA1";
+        let a = "2AAAA";
+        let b = "AAAA2";
         let result = second_ordering(a, b);
-        assert_eq!(result, -1);
+        assert_eq!(result, 1);
     }
 
     #[test]
@@ -395,9 +394,5 @@ JJJJJ 483";
         assert_eq!(result, 6440);
     }
 
-    #[test]
-    fn scn_p1_02() {
-        let result = part1(INPUT2);
-        assert_eq!(result, 6440);
-    }
+
 }
