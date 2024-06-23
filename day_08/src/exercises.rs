@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+
 pub fn part1(input: &str) -> u64 {
     let mut nodes: HashMap<String, (String, String)> = HashMap::new();
     let mut lines: Vec<&str> = input.split("\n").collect();
@@ -31,6 +32,21 @@ pub fn part1(input: &str) -> u64 {
     look_ups
 }
 
+pub fn lcm(nums: &[usize]) -> usize {
+    if nums.len() == 1 {
+        return nums[0];
+    }
+    let a = nums[0];
+    let b = lcm(&nums[1..]);
+    a * b / gcd_of_two_numbers(a, b)
+}
+
+fn gcd_of_two_numbers(a: usize, b: usize) -> usize {
+    if b == 0 {
+        return a;
+    }
+    gcd_of_two_numbers(b, a % b)
+}
 
 fn _create_entry(input: String) -> (String, String, String) {
     let line: Vec<_> = input.split("=").collect();
@@ -52,41 +68,47 @@ fn create_entry2<'a>(input: String, hm: &'a mut HashMap<String, (String, String)
     hm.insert(node_key, (left_node, right_node)); 
 }
 
-
+fn traverse(nodes: &HashMap<String, (String, String)>, map: &Vec<char>, current_node: String) -> usize {
+    let mut look_ups: usize = 0;
+    let mut found = false;
+    let mut map_index = 0;
+    let mut aux_node = current_node;
+    while !found {
+        let node = &nodes[&aux_node];
+        aux_node = match map[map_index] {
+            'L' => node.0.clone(),
+            'R' => node.1.clone(),
+            _ => panic!("Invalid value in map")
+        };
+        if aux_node == "ZZZ" {
+            found = true;
+        } else {
+            map_index = (map_index + 1) % map.len();
+        }
+        look_ups += 1;
+    }  
+    look_ups  
+}
 
 pub fn part2(input: &str) -> u64 {
     let mut nodes: HashMap<String, (String, String)> = HashMap::new();
     let mut lines: Vec<&str> = input.split("\n").collect();
 
     let map: Vec<char> = lines[0].chars().collect();
-    let mut look_ups = 0u64;
     let raw_nodes: Vec<&str> = lines.split_off(2);
     for raw_node in raw_nodes {
         create_entry2(raw_node.to_string(), &mut nodes);
     }
-    let mut init_nodes: Vec<String> = nodes.keys().filter(|n| n.ends_with("A")).map(|m| m.clone()).collect(); 
-    let mut map_index = 0;
-    while !all_end_nodes(&init_nodes) {
-        for i in 0..init_nodes.len() {
-            let node_key = &init_nodes[i];
-            let node = &nodes[node_key];
-            let next_node = match map[map_index] {
-                'L' => node.0.clone(),
-                'R' => node.1.clone(),
-                _ => panic!("Invalid value in map")
-            };
-            init_nodes[i] = next_node;
-        }
-        look_ups += 1;
-        map_index = (map_index + 1) % map.len();
-    }
-    look_ups
+    let init_nodes: Vec<String> = nodes.keys().filter(|n| n.ends_with("A")).map(|m| m.clone()).collect(); 
+    let mut lll: Vec<usize> = init_nodes.into_iter().map(|node| traverse(&nodes, &map, node)).collect();
+    lll.push(1);
+    let array = lll.split_last().unwrap().1;
+    lcm(array) as u64
 }
 
 
-fn all_end_nodes(nodes: &Vec<String>) -> bool {
-    let l = nodes.len();
-    nodes.into_iter().filter(|n| n.ends_with("Z")).count() == l 
+fn _all_end_nodes(nodes: &Vec<String>, num_nodes: usize) -> bool {
+    nodes.into_iter().filter(|n| n.ends_with("Z")).count() == num_nodes
 }
 
 
