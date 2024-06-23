@@ -18,7 +18,7 @@ pub fn part1(input: &str) -> u64 {
         current_node = match map[map_index] {
             'L' => node.0.clone(),
             'R' => node.1.clone(),
-            _ => "".to_string()
+            _ => panic!("Invalid value in map")
         };
         if current_node == "ZZZ" {
             found = true;
@@ -54,9 +54,41 @@ fn create_entry2<'a>(input: String, hm: &'a mut HashMap<String, (String, String)
 
 
 
-pub fn part2(_input: &str) -> u32 {
-    0
+pub fn part2(input: &str) -> u64 {
+    let mut nodes: HashMap<String, (String, String)> = HashMap::new();
+    let mut lines: Vec<&str> = input.split("\n").collect();
+
+    let map: Vec<char> = lines[0].chars().collect();
+    let mut look_ups = 0u64;
+    let raw_nodes: Vec<&str> = lines.split_off(2);
+    for raw_node in raw_nodes {
+        create_entry2(raw_node.to_string(), &mut nodes);
+    }
+    let mut init_nodes: Vec<String> = nodes.keys().filter(|n| n.ends_with("A")).map(|m| m.clone()).collect(); 
+    let mut map_index = 0;
+    while !all_end_nodes(&init_nodes) {
+        for i in 0..init_nodes.len() {
+            let node_key = &init_nodes[i];
+            let node = &nodes[node_key];
+            let next_node = match map[map_index] {
+                'L' => node.0.clone(),
+                'R' => node.1.clone(),
+                _ => panic!("Invalid value in map")
+            };
+            init_nodes[i] = next_node;
+        }
+        look_ups += 1;
+        map_index = (map_index + 1) % map.len();
+    }
+    look_ups
 }
+
+
+fn all_end_nodes(nodes: &Vec<String>) -> bool {
+    let l = nodes.len();
+    nodes.into_iter().filter(|n| n.ends_with("Z")).count() == l 
+}
+
 
 #[cfg(test)]
 mod tests {
@@ -78,6 +110,17 @@ ZZZ = (ZZZ, ZZZ)";
 AAA = (BBB, BBB)
 BBB = (AAA, ZZZ)
 ZZZ = (ZZZ, ZZZ)";
+
+    const INPUT3: &str = "LR
+
+11A = (11B, XXX)
+11B = (XXX, 11Z)
+11Z = (11B, XXX)
+22A = (22B, XXX)
+22B = (22C, 22C)
+22C = (22Z, 22Z)
+22Z = (22B, 22B)
+XXX = (XXX, XXX)";
 
     #[test]
     fn create_entry_001() {
@@ -104,6 +147,13 @@ ZZZ = (ZZZ, ZZZ)";
     #[test]
     fn part1_002() {
         let res = part1(INPUT2);
+        assert_eq!(res, 6);
+    }
+
+
+    #[test]
+    fn part2_001() {
+        let res = part2(INPUT3);
         assert_eq!(res, 6);
     }
 
