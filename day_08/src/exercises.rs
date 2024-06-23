@@ -1,22 +1,18 @@
 use std::collections::HashMap;
 
-pub fn part1(input: &str) -> u32 {
+pub fn part1(input: &str) -> u64 {
     let mut nodes: HashMap<String, (String, String)> = HashMap::new();
     let mut lines: Vec<&str> = input.split("\n").collect();
 
     let map: Vec<char> = lines[0].chars().collect();
-    let mut look_ups = 0;
-    let mut first_node = String::new();
+    let mut look_ups = 0u64;
     let raw_nodes: Vec<&str> = lines.split_off(2);
     for raw_node in raw_nodes {
         create_entry2(raw_node.to_string(), &mut nodes);
-        if nodes.len() == 1 {
-            first_node = nodes.keys().last().unwrap().to_string();
-        }
     }
     let mut found = false;
     let mut map_index = 0;
-    let mut current_node = first_node;
+    let mut current_node = "AAA".to_string();
     while !found {
         let node = &nodes[&current_node];
         current_node = match map[map_index] {
@@ -36,7 +32,7 @@ pub fn part1(input: &str) -> u32 {
 }
 
 
-fn create_entry(input: String) -> (String, String, String) {
+fn _create_entry(input: String) -> (String, String, String) {
     let line: Vec<_> = input.split("=").collect();
     let node_key = line[0].trim().to_owned();
     let s = line[1].replace("(", "").replace(")", "");
@@ -58,7 +54,7 @@ fn create_entry2<'a>(input: String, hm: &'a mut HashMap<String, (String, String)
 
 
 
-pub fn part2(input: &str) -> u32 {
+pub fn part2(_input: &str) -> u32 {
     0
 }
 
@@ -85,7 +81,7 @@ ZZZ = (ZZZ, ZZZ)";
 
     #[test]
     fn create_entry_001() {
-        let res = create_entry("CCC = (ZZZ, GGG)".to_string());
+        let res = _create_entry("CCC = (ZZZ, GGG)".to_string());
         assert_eq!(res.0, "CCC");
         assert_eq!(res.1, "ZZZ");
         assert_eq!(res.2, "GGG");
@@ -94,7 +90,7 @@ ZZZ = (ZZZ, ZZZ)";
     #[test]
     fn create_entry2_001() {
         let mut nodes: HashMap<String, (String, String)> = HashMap::new();
-        let res = create_entry2("CCC = (ZZZ, GGG)".to_string(), &mut nodes);
+        create_entry2("CCC = (ZZZ, GGG)".to_string(), &mut nodes);
         assert_eq!(nodes["CCC"].0, "ZZZ");
         assert_eq!(nodes["CCC"].1, "GGG");
     }
