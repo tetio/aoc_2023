@@ -80,13 +80,14 @@ fn traverse(nodes: &HashMap<String, (String, String)>, map: &Vec<char>, current_
             'R' => node.1.clone(),
             _ => panic!("Invalid value in map")
         };
-        if aux_node == "ZZZ" {
+        if aux_node.ends_with("Z") {
             found = true;
         } else {
             map_index = (map_index + 1) % map.len();
         }
         look_ups += 1;
     }  
+    println!("Lookup={}", look_ups);
     look_ups  
 }
 
@@ -99,7 +100,7 @@ pub fn part2(input: &str) -> u64 {
     for raw_node in raw_nodes {
         create_entry2(raw_node.to_string(), &mut nodes);
     }
-    let init_nodes: Vec<String> = nodes.keys().filter(|n| n.ends_with("A")).map(|m| m.clone()).collect(); 
+    let init_nodes: Vec<String> = nodes.keys().into_iter().filter(|n| n.ends_with("A")).map(|m| m.clone()).collect(); 
     let mut lll: Vec<usize> = init_nodes.into_iter().map(|node| traverse(&nodes, &map, node)).collect();
     lll.push(1);
     let array = lll.split_last().unwrap().1;
