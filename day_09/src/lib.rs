@@ -4,8 +4,8 @@ pub fn part1(input: &str) -> i32 {
     input.split("\n").map(|line| process_sensor(line)).sum()
 }
 
-pub fn part2(_input: &str) -> i32 {
-    0
+pub fn part2(input: &str) -> i32 {
+    input.split("\n").map(|line| process_sensor2(line)).sum()
 }
 
 fn process_sensor(line: &str) -> i32 {
@@ -16,6 +16,16 @@ fn process_sensor(line: &str) -> i32 {
     let history = calculate_differences(data);
     let last_values: Vec<i32> = history.into_iter().rev().map(|x| x[x.len() - 1]).collect();
     predict_value(last_values)
+}
+
+fn process_sensor2(line: &str) -> i32 {
+    let data: Vec<i32> = line
+        .split(" ")
+        .map(|n| n.parse::<i32>().expect("(!) A number was expected!"))
+        .collect();
+    let history = calculate_differences(data);
+    let first_values: Vec<i32> = history.into_iter().rev().map(|x| x[0]).collect();
+    predict_value2(first_values)
 }
 
 fn calculate_differences(data: Vec<i32>) -> Vec<Vec<i32>> {
@@ -39,6 +49,14 @@ fn predict_value(values: Vec<i32>) -> i32 {
     let mut value = 0;
     for i in 1..values.len() {
         value = values[i] + value;
+    }
+    value
+}
+
+fn predict_value2(values: Vec<i32>) -> i32 {
+    let mut value = 0;
+    for i in 1..values.len() {
+        value = values[i] - value;
     }
     value
 }
@@ -94,5 +112,12 @@ mod tests {
         let v = "10 13 16 21 30 45";
         let res = process_sensor(v);
         assert_eq!(res, 68)
+    }
+
+    #[test]
+    fn scn_process_sensor2_01() {
+        let v = "10 13 16 21 30 45";
+        let res = process_sensor2(v);
+        assert_eq!(res, 5)
     }
 }
