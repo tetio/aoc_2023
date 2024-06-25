@@ -32,31 +32,8 @@ pub fn part1(input: &str) -> u64 {
     look_ups
 }
 
-pub fn lcm(nums: &[usize]) -> usize {
-    if nums.len() == 1 {
-        return nums[0];
-    }
-    let a = nums[0];
-    let b = lcm(&nums[1..]);
-    a * b / gcd_of_two_numbers(a, b)
-}
 
-fn gcd_of_two_numbers(a: usize, b: usize) -> usize {
-    if b == 0 {
-        return a;
-    }
-    gcd_of_two_numbers(b, a % b)
-}
 
-fn _create_entry(input: String) -> (String, String, String) {
-    let line: Vec<_> = input.split("=").collect();
-    let node_key = line[0].trim().to_owned();
-    let s = line[1].replace("(", "").replace(")", "");
-    let node_value: Vec<&str> = s.split(",").collect();
-    let left_node = node_value[0].trim().to_owned();
-    let right_node = node_value[1].trim().to_owned();
-    (node_key, left_node, right_node) 
-}
 
 fn create_entry2<'a>(input: String, hm: &'a mut HashMap<String, (String, String)>) {
     let line: Vec<_> = input.split("=").collect();
@@ -107,9 +84,20 @@ pub fn part2(input: &str) -> u64 {
     lcm(array) as u64
 }
 
+pub fn lcm(nums: &[usize]) -> usize {
+    if nums.len() == 1 {
+        return nums[0];
+    }
+    let a = nums[0];
+    let b = lcm(&nums[1..]);
+    a * b / gcd_of_two_numbers(a, b)
+}
 
-fn _all_end_nodes(nodes: &Vec<String>, num_nodes: usize) -> bool {
-    nodes.into_iter().filter(|n| n.ends_with("Z")).count() == num_nodes
+fn gcd_of_two_numbers(a: usize, b: usize) -> usize {
+    if b == 0 {
+        return a;
+    }
+    gcd_of_two_numbers(b, a % b)
 }
 
 
@@ -145,13 +133,6 @@ ZZZ = (ZZZ, ZZZ)";
 22Z = (22B, 22B)
 XXX = (XXX, XXX)";
 
-    #[test]
-    fn create_entry_001() {
-        let res = _create_entry("CCC = (ZZZ, GGG)".to_string());
-        assert_eq!(res.0, "CCC");
-        assert_eq!(res.1, "ZZZ");
-        assert_eq!(res.2, "GGG");
-    }
 
     #[test]
     fn create_entry2_001() {
