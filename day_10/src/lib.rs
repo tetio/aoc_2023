@@ -7,7 +7,7 @@ pub fn part1(input: &str) -> i32 {
 
     let start_pos = where_is_s(&map);
     let mut current_postion = start_pos;
-    let mut res: Vec<(usize, usize)> = Vec::new();
+    let mut res: Vec<(i32, i32)> = Vec::new();
     let mut first = true;
     while current_postion != start_pos || first {
         first = false;
@@ -18,11 +18,11 @@ pub fn part1(input: &str) -> i32 {
     res.len() as i32 / 2
 }
 
-fn tile_at(map: &Vec<Vec<char>>, x: usize, y: usize) -> char {
-    if x > map.len() || y > map[0].len() {
+fn tile_at(map: &Vec<Vec<char>>, x:i32, y:i32) -> char {
+    if x > map.len() as i32|| y > map[0].len() as i32{
         panic!("Coords out of bounds ({}, {})", x, y);
     }
-    map[y][x]
+    map[y as usize][x as usize]
 }
 
 
@@ -31,12 +31,12 @@ pub fn part2(_input: &str) -> u32 {
     0
 }
 
-fn where_is_s(map: &Vec<Vec<char>>) -> (usize, usize) {
-    let mut res : (usize, usize) = (0, 0);
+fn where_is_s(map: &Vec<Vec<char>>) -> (i32, i32) {
+    let mut res : (i32, i32) = (0, 0);
     for i in 0..map.len() {
         for j in 0..map[i].len() {
-            if tile_at(map, i, j) == 'S' {
-                res = (i, j);
+            if tile_at(map, i as i32, j as i32) == 'S' {
+                res = (i as i32, j as i32);
                 break;
             }
         }
@@ -44,7 +44,7 @@ fn where_is_s(map: &Vec<Vec<char>>) -> (usize, usize) {
     res
 }
 
-fn next_move(map: &Vec<Vec<char>>, current_postion: (usize, usize), res: &Vec<(usize, usize)>) -> (usize, usize) {
+fn next_move(map: &Vec<Vec<char>>, current_postion: (i32, i32), res: &Vec<(i32, i32)>) -> (i32, i32) {
     let current_tile = tile_at(map, current_postion.0, current_postion.1);
     let destinations = get_connections(current_tile);
     let almost_valid_destinations: Vec<char> = destinations.into_iter()
@@ -53,13 +53,13 @@ fn next_move(map: &Vec<Vec<char>>, current_postion: (usize, usize), res: &Vec<(u
         .filter(|d| {
             let direction = get_direction(*d);
             let next_position = (current_postion.0 as i32 + direction.0, current_postion.1 as i32 + direction.1);        
-            let aux = (next_position.0 as usize, next_position.1 as usize);
+            let aux = (next_position.0, next_position.1);
             !res.contains(&aux)
         })
         .collect();
 
         let direction = get_direction(valid_destinations[0]);
-        (current_postion.0 + direction.0 as usize, current_postion.1 + direction.1 as usize)
+        (current_postion.0 + direction.0, current_postion.1 + direction.1)
 }
 
 fn get_connections(tile: char) -> Vec<char> {
@@ -76,19 +76,19 @@ fn get_connections(tile: char) -> Vec<char> {
     destinations
 }
 
-fn is_valid_move(map: &Vec<Vec<char>>, destination: char, current_position: (usize, usize)) -> bool {
+fn is_valid_move(map: &Vec<Vec<char>>, destination: char, current_position: (i32, i32)) -> bool {
     let dir = get_direction(destination);
     if is_invalid_position(current_position, dir, map) {
         false
     } else {
-        let connections_from_destination = get_connections(tile_at(map, (current_position.0 as i32 + dir.0) as usize,  (current_position.1 as i32 + dir.1) as usize));
+        let connections_from_destination = get_connections(tile_at(map, (current_position.0 as i32 + dir.0),  (current_position.1 as i32 + dir.1)));
         let valid_connections: Vec<char> =  connections_from_destination.into_iter()
             .filter(|connection| reverse_connection(*connection ) == destination).collect();
         valid_connections.len() > 0
     }
 }
 
-fn is_invalid_position(current_position: (usize, usize), dir: (i32, i32), map: &Vec<Vec<char>>) -> bool {
+fn is_invalid_position(current_position: (i32, i32), dir: (i32, i32), map: &Vec<Vec<char>>) -> bool {
     current_position.0 as i32 + dir.0 < 0 || 
         current_position.1 as i32 + dir.1 < 0 || 
         current_position.1 as i32 + dir.1 >= map.len() as i32 || 
@@ -101,7 +101,7 @@ fn get_direction(direction: char) -> (i32, i32) {
         's' => (0, 1),
         'w' => (-1, 0),
         'e' => (1, 0),
-        _ => (0, 0)
+        _ => panic!("Invalid direction {}", direction),
     }
 }
 
@@ -115,7 +115,7 @@ fn reverse_connection(connection: char) -> char {
         'e' => 'w',
         'n' => 's',
         's' => 'n',
-        _ => panic!("Could not reverse connection"),
+        _ => panic!("Could not reverse connection {}", connection),
 
     }
 }
@@ -185,7 +185,7 @@ L|-JF";
     #[test]
     fn scn_part1_00() {
         let s = part1(MAP);
-        assert_eq!(s, 8);
+        assert_eq!(s, 4);
     }
 }
 
