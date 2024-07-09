@@ -120,6 +120,21 @@ fn reverse_connection(connection: char) -> char {
     }
 }
 
+
+fn get_possible_steps(map: &Vec<Vec<char>>, visited: &Vec<(i32, i32)>, position: (i32, i32)) -> Vec<(i32, i32)> {
+
+    let mut possible_moves = vec![
+        (position.0 - 1, position.1),
+        (position.0 + 1, position.1),
+        (position.0, position.1 - 1),
+        (position.0, position.1 - 1)
+    ];
+    possible_moves.into_iter()
+        .filter(|p| p.0 >= 0 && p.0 < map[0].len() as i32 && p.1 >= 0 && p.1 < map.len() as i32 && !visited.contains(p))
+        .collect::<Vec<(i32, i32)>>()
+}
+
+
 #[cfg(test)]
 mod tests {
     use super::*;
