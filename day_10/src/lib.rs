@@ -1,21 +1,6 @@
-
 pub fn part1(input: &str) -> i32 {
-    let map: Vec<Vec<char>> = input
-        .split("\n")
-        .map(|line| line.chars().into_iter().collect::<Vec<char>>())
-        .collect();
-
-    let start_pos = where_is_s(&map);
-    let mut current_postion = start_pos;
-    let mut res: Vec<(i32, i32)> = Vec::new();
-    let mut first = true;
-    while current_postion != start_pos || first {
-        first = false;
-        current_postion = next_move(&map, current_postion, &res);
-        res.push(current_postion);
-        println!("***  current_postion = {:?}", current_postion);
-    }
-    res.len() as i32 / 2
+    let (_, shape) = calculate_shape(input);
+    shape.len() as i32 / 2
 }
 
 fn tile_at(map: &Vec<Vec<char>>, x:i32, y:i32) -> char {
@@ -27,9 +12,36 @@ fn tile_at(map: &Vec<Vec<char>>, x:i32, y:i32) -> char {
 
 
 
-pub fn part2(_input: &str) -> u32 {
+pub fn part2(input: &str) -> u32 {
+    let (map, shape) = calculate_shape(input);
+    // calculate all candidate positions
+    // for each candidate
+        // if it is a position not already checked then
+            // fill from this position 
+                // -> reaches boundaries -> discard 
+                // -> Otherwise the position is inside the shape -> add to result
     0
 }
+
+
+fn calculate_shape(input: &str) -> (Vec<Vec<char>>, Vec<(i32, i32)>) {
+    let map: Vec<Vec<char>> = input
+        .split("\n")
+        .map(|line| line.chars().into_iter().collect::<Vec<char>>())
+        .collect();
+    let start_pos = where_is_s(&map);
+    let mut current_postion = start_pos;
+    let mut shape: Vec<(i32, i32)> = Vec::new();
+    let mut first = true;
+    while current_postion != start_pos || first {
+        first = false;
+        current_postion = next_move(&map, current_postion, &shape);
+        shape.push(current_postion);
+        //println!("***  current_postion = {:?}", current_postion);
+    }
+    (map, shape)
+}
+
 
 fn where_is_s(map: &Vec<Vec<char>>) -> (i32, i32) {
     let mut res : (i32, i32) = (0, 0);
@@ -89,10 +101,8 @@ fn is_valid_move(map: &Vec<Vec<char>>, destination: char, current_position: (i32
 }
 
 fn is_invalid_position(current_position: (i32, i32), dir: (i32, i32), map: &Vec<Vec<char>>) -> bool {
-    current_position.0 as i32 + dir.0 < 0 || 
-        current_position.1 as i32 + dir.1 < 0 || 
-        current_position.1 as i32 + dir.1 >= map.len() as i32 || 
-        current_position.0 as i32 + dir.0 >= map[0].len() as i32
+    let new_pos = (current_position.0 + dir.0, current_position.1 + dir.1); 
+    !position_in_map(map, &new_pos)
 }
 
 fn get_direction(direction: char) -> (i32, i32) {
@@ -121,17 +131,21 @@ fn reverse_connection(connection: char) -> char {
 }
 
 
-fn get_possible_steps(map: &Vec<Vec<char>>, visited: &Vec<(i32, i32)>, position: (i32, i32)) -> Vec<(i32, i32)> {
+fn get_possible_moves(map: &Vec<Vec<char>>, visited: &Vec<(i32, i32)>, position: (i32, i32)) -> Vec<(i32, i32)> {
 
-    let mut possible_moves = vec![
+    let possible_moves = vec![
         (position.0 - 1, position.1),
         (position.0 + 1, position.1),
         (position.0, position.1 - 1),
         (position.0, position.1 - 1)
     ];
     possible_moves.into_iter()
-        .filter(|p| p.0 >= 0 && p.0 < map[0].len() as i32 && p.1 >= 0 && p.1 < map.len() as i32 && !visited.contains(p))
+        .filter(|p| position_in_map(map, p) && !visited.contains(p))
         .collect::<Vec<(i32, i32)>>()
+}
+
+fn position_in_map(map: &Vec<Vec<char>>, p: &(i32, i32)) -> bool {
+    p.0 >= 0 && p.0 < map[0].len() as i32 && p.1 >= 0 && p.1 < map.len() as i32 
 }
 
 
