@@ -12,15 +12,27 @@ fn tile_at(map: &Vec<Vec<char>>, x:i32, y:i32) -> char {
 
 
 
-pub fn part2(input: &str) -> u32 {
+pub fn part2(input: &str) -> i32 {
     let (map, shape) = calculate_shape(input);
+    let mut visited: Vec<(i32, i32)> = vec![];
+    let mut inside_shape: Vec<(i32, i32)> = vec![];
     // calculate all candidate positions
+    let all_positions = all_moves(map[0].len() as i32, map.len() as i32, &shape);
+    all_positions.iter().for_each(|p| {
+        if is_inside(&p, &shape) {
+            inside_shape.push(*p)
+        }
+    });
     // for each candidate
         // if it is a position not already checked then
             // fill from this position 
                 // -> reaches boundaries -> discard 
                 // -> Otherwise the position is inside the shape -> add to result
-    0
+    all_positions.len() as i32
+}
+
+fn is_inside(p: &(i32, i32), shape: &[(i32, i32)]) -> bool {
+    true
 }
 
 
@@ -90,19 +102,19 @@ fn get_connections(tile: char) -> Vec<char> {
 
 fn is_valid_move(map: &Vec<Vec<char>>, destination: char, current_position: (i32, i32)) -> bool {
     let dir = get_direction(destination);
-    if is_invalid_position(current_position, dir, map) {
+    if is_invalid_position(map[0].len() as i32, map.len() as i32, current_position, dir) {
         false
     } else {
-        let connections_from_destination = get_connections(tile_at(map, (current_position.0 as i32 + dir.0),  (current_position.1 as i32 + dir.1)));
+        let connections_from_destination = get_connections(tile_at(map, current_position.0 as i32 + dir.0,  current_position.1 as i32 + dir.1));
         let valid_connections: Vec<char> =  connections_from_destination.into_iter()
             .filter(|connection| reverse_connection(*connection ) == destination).collect();
         valid_connections.len() > 0
     }
 }
 
-fn is_invalid_position(current_position: (i32, i32), dir: (i32, i32), map: &Vec<Vec<char>>) -> bool {
+fn is_invalid_position(width: i32, height: i32, current_position: (i32, i32), dir: (i32, i32)) -> bool {
     let new_pos = (current_position.0 + dir.0, current_position.1 + dir.1); 
-    !position_in_map(map, &new_pos)
+    !is_position_inside_map(width, height, &new_pos)
 }
 
 fn get_direction(direction: char) -> (i32, i32) {
@@ -130,8 +142,21 @@ fn reverse_connection(connection: char) -> char {
     }
 }
 
+fn all_moves(width: i32, height: i32, shape: &Vec<(i32, i32)>) -> Vec<(i32, i32)> {
+    let mut res: Vec<(i32, i32)> = vec![]; 
+    for i in 0..width {
+        for j in 0..height {
+            let pos = (i as i32, j as i32);
+            if !shape.contains(&pos) {
+                res.push(pos);
+            }
+        }
+    }
+    res
+}
 
-fn get_possible_moves(map: &Vec<Vec<char>>, visited: &Vec<(i32, i32)>, position: (i32, i32)) -> Vec<(i32, i32)> {
+
+fn get_possible_moves_from_position(width: i32, height: i32, visited: &Vec<(i32, i32)>, position: (i32, i32)) -> Vec<(i32, i32)> {
 
     let possible_moves = vec![
         (position.0 - 1, position.1),
@@ -140,12 +165,12 @@ fn get_possible_moves(map: &Vec<Vec<char>>, visited: &Vec<(i32, i32)>, position:
         (position.0, position.1 - 1)
     ];
     possible_moves.into_iter()
-        .filter(|p| position_in_map(map, p) && !visited.contains(p))
+        .filter(|p| is_position_inside_map(width, height, p) && !visited.contains(p))
         .collect::<Vec<(i32, i32)>>()
 }
 
-fn position_in_map(map: &Vec<Vec<char>>, p: &(i32, i32)) -> bool {
-    p.0 >= 0 && p.0 < map[0].len() as i32 && p.1 >= 0 && p.1 < map.len() as i32 
+fn is_position_inside_map(width: i32, height: i32, p: &(i32, i32)) -> bool {
+    p.0 >= 0 && p.0 < width as i32 && p.1 >= 0 && p.1 < height as i32 
 }
 
 
