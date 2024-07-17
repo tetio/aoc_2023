@@ -169,35 +169,20 @@ struct Day10 {
     positions.filter { $0.0 == 0 || $0.1 == 0 || $0.0 == width - 1 || $0.1 == height - 1 }.count > 0
   }
 
-  //   func findAllInsiders() -> [(Int, Int)] {
-  //     var candidates: [(Int, Int)] = []
-  //     for i in 0..<width {
-  //       for j in 0..<height {
-  //         if !shape.contains(where: {$0 == (i, j)}) {
-  //           candidates.append((i, j))
-  //         }
-  //       }
-  //     }
-  //     let res = candidates.map {!isOutsider(candidates: $0)}
-  //     (0, 0)
-  //   }
+    func findAllInsiders() -> [(Int, Int)] {
+      var candidates: [(Int, Int)] = []
+      for i in 0..<width {
+        for j in 0..<height {
+          if !shape.contains(where: {$0 == (i, j)}) {
+            candidates.append((i, j))
+          }
+        }
+      }
+      let res = candidates.flatMap {floodFill(node: $0).map {!isOutsider(candidates: $0)}} //
+      (0, 0)
+    }
 
   static func main() throws {
-    // let day10 = try Day10(path: "input.txt")
-
-    // var numbers = [1, 2, 3, 4, 34, 67, 5, 23, 12]
-    // numbers.append(contentsOf: [100, 101, 102])
-    // numbers.append(contentsOf: [1020, 1012, 1022])
-    // let even = numbers.filter { $0 % 2 == 0 }
-    // let odd = numbers.filter { $0 % 2 != 0 }
-    // let sum = numbers.reduce(0, +)
-    // print("Total numbers = \(numbers.count)")
-    // print("Total even numbers = \(even.count)")
-    // print("Total odd numbers = \(odd.count)")
-    // print("Value of sum = \(sum)")
-    // print("Where is the starting point: \(try day10.whereIsStartPoint())")
-    // print("Part1 result is \(day10.part1())")
-
     let day10A = try Day10(path: "test1.txt")
     let outside = day10A.floodFill(node: (0, 0))
     print("flood fill outside result has \(outside.count) tiles")
@@ -205,7 +190,6 @@ struct Day10 {
     let inside = day10A.floodFill(node: (2, 2))
     print("flood fill inside result has \(inside.count) tiles")
     print("flood fill inside result is \(inside) ")
-
   }
 
 }
