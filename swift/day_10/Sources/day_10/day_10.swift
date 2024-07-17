@@ -169,18 +169,32 @@ struct Day10 {
     positions.filter { $0.0 == 0 || $0.1 == 0 || $0.0 == width - 1 || $0.1 == height - 1 }.count > 0
   }
 
-    func findAllInsiders() -> [(Int, Int)] {
-      var candidates: [(Int, Int)] = []
-      for i in 0..<width {
-        for j in 0..<height {
-          if !shape.contains(where: {$0 == (i, j)}) {
-            candidates.append((i, j))
-          }
+  func findAllInsiders() -> [(Int, Int)] {
+    var candidates: [(Int, Int)] = []
+    var insiders: [(Int, Int)] = []
+    for i in 0..<width {
+      for j in 0..<height {
+        if !shape.contains(where: {$0 == (i, j)}) {
+          candidates.append((i, j))
         }
       }
-      let res = candidates.flatMap {floodFill(node: $0).map {!isOutsider(candidates: $0)}} //
-      (0, 0)
     }
+    //return candidates.map {floodFill(node: $0)}.filter {!isOutsider(positions: $0)}.flatMap{$0}.filter {$0}
+    for candidate in candidates {
+      let ff =  floodFill(node: candidate)
+      if !isOutsider(positions:ff) {
+        for insider in ff {
+          if !insiders.contains(where: {$0 == insider}) {
+            insiders.append(insider)
+            candidates.removeAll(where: {$0 == insider})
+          }
+        }
+      } else {
+        candidates = candidates.filter{ pos in return !ff.contains(where: {pos == $0})}
+      }
+    }
+    return insiders
+  }
 
   static func main() throws {
     let day10A = try Day10(path: "test1.txt")
@@ -190,6 +204,13 @@ struct Day10 {
     let inside = day10A.floodFill(node: (2, 2))
     print("flood fill inside result has \(inside.count) tiles")
     print("flood fill inside result is \(inside) ")
+
+     let day10 = try Day10(path: "input.txt")
+     let initTime = Date()
+     let insiders = day10.findAllInsiders()
+     let endTime = Date()
+     let diff = endTime.timeIntervalSince1970 - initTime.timeIntervalSince1970
+     print("Part2's result is \(insiders.count) and took \(diff) seconds")
   }
 
 }

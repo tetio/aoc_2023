@@ -14,11 +14,8 @@ final class day_10Tests: XCTestCase {
     XCTAssertEqual(processed.count, 16, "Unexpected result")
   }
 
-  func testExample() throws {
-    // XCTest Documentation
-    // https://developer.apple.com/documentation/xctest
-
-    // Defining Test Cases and Test Methods
-    // https://developer.apple.com/documentation/xctest/defining_test_cases_and_test_methods
+  func testProcessed002() throws {
+    let processed = day10.findAllInsiders()
+    XCTAssertEqual(processed.count, 1, "Unexpected result")
   }
 }
