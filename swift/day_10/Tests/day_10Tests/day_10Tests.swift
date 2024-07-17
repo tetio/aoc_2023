@@ -3,18 +3,19 @@ import XCTest
 @testable import day_10
 
 final class day_10Tests: XCTestCase {
-  var day10: Day10!
 
   override func setUp() async throws {
-    day10 = try Day10(path: "test1.txt")
+    
   }
 
   func testProcessed001() throws {
+    let day10 = try Day10(path: "test1.txt")
     let processed = day10.floodFill(node: (0, 0))
     XCTAssertEqual(processed.count, 16, "Unexpected result")
   }
 
   func testProcessed002() throws {
+    let day10 = try Day10(path: "test1.txt")
     let processed = day10.findAllInsidersRaycasting()
     XCTAssertEqual(processed.count, 1, "Unexpected result")
   }
@@ -31,10 +32,30 @@ final class day_10Tests: XCTestCase {
     XCTAssertEqual(processed.count, 4, "Unexpected result")
   }
 
+  func testProcessed0041() throws {
+    let day10 = try Day10(path: "test4.txt")
+    let processed = day10.findAllInsidersRaycasting()
+    XCTAssertEqual(processed.count, 4, "Unexpected result")
+  }
+
+
+
   func testProcessed005() throws {
     let day10 = try Day10(path: "input2.txt")
     let processed = day10.findAllInsidersRaycasting()
     XCTAssertEqual(processed.count, 10, "Unexpected result")
+  }
+
+
+  func testProcessed005b() throws {
+    let day10 = try Day10(path: "input2.txt")
+    //let processed = day10.findAllInsidersRaycasting()
+      let candidate = (14,3)
+      let n = day10.nortRayHasOddIntersections(candidate) 
+      let s = day10.southRayOddIntersections(candidate)
+      let w = day10.westRayOddIntersections(candidate)
+      let e = day10.eastRayOddIntersections(candidate)
+    XCTAssertEqual(10, 10, "Unexpected result")
   }
 
 
