@@ -14,3 +14,9 @@
 *.pdb
 
 **/.idea/
+
+*.beam
+*.ez
+/build
+erl_crash.dump
+

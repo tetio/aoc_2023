@@ -41,11 +41,16 @@ struct Day10 {
     let startingPosition = try whereIsStartPoint()
     var currentPosition = startingPosition
     var shape: [(Int, Int)] = []
+    shape.append(currentPosition)
     var first = true
     while currentPosition != startingPosition || first {
       first = false
       currentPosition = try nextMove(position: currentPosition, res: shape)
-      shape.append(currentPosition)
+      if currentPosition != (-1, -1){
+        shape.append(currentPosition)
+      } else {
+        currentPosition = startingPosition
+      }
     }
     return shape
   }
@@ -63,6 +68,9 @@ struct Day10 {
         let nextPosition = addDirection(position: position, direction: direction)
         return !res.contains(where: { $0 == nextPosition })
       })
+    if validDestination.isEmpty {
+      return (-1, -1) 
+    }
     let direction = try getDirection(orientation: validDestination[0])
     return addDirection(position: position, direction: direction)
   }
