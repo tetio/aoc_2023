@@ -185,6 +185,19 @@ struct Day10 {
     return processed
   }
 
+  func shoelaceAlgorithm() -> Int {
+    var sum1 = 0
+    var sum2 = 0
+    for i in 0..<self.shape.count-1 {
+      sum1 = sum1 + shape[i].0 * shape[i+1].1
+      sum2 = sum2 + shape[i].1 * shape[i+1].0
+    }
+    sum1 = sum1 + shape.last!.0 * shape[0].1
+    sum2 = sum2 + shape[0].0 * shape.last!.1
+    let area = abs(sum1 - sum2)/2
+    return self.shape.count - area
+  }
+
   static func main() throws {
     let day10A = try Day10(path: "test1.txt")
     let outside = day10A.floodFill(node: (0, 0))
